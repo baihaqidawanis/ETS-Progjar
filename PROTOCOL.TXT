@@ -1,0 +1,77 @@
+FILE SERVER  
+TUJUAN: Melayani client dalam request file server  
+
+ATURAN PROTOKOL:  
+- Client harus mengirimkan request dalam bentuk string  
+- String harus dalam format:  
+  REQUEST spasi PARAMETER  
+- PARAMETER dapat berkembang menjadi PARAMETER1 spasi PARAMETER2 dan seterusnya  
+- Semua hasil dikembalikan dalam format JSON dan diakhiri dengan karakter ASCII "\r\n\r\n" (kode #13#10#13#10)  
+
+REQUEST YANG DILAYANI:
+
+1. LIST  
+* TUJUAN: Mendapatkan daftar seluruh file yang tersedia di server  
+* PARAMETER: Tidak ada  
+* FORMAT:  
+  LIST\r\n\r\n  
+* HASIL:  
+  - BERHASIL:  
+    - status: OK  
+    - data: list file  
+  - GAGAL:  
+    - status: ERROR  
+    - data: pesan kesalahan  
+
+2. GET  
+* TUJUAN: Mendapatkan isi file tertentu dari server  
+* PARAMETER:  
+  - PARAMETER1: nama file  
+* FORMAT:  
+  GET nama_file.ext\r\n\r\n  
+* HASIL:  
+  - BERHASIL:  
+    - status: OK  
+    - data_namafile: nama file  
+    - data_file: isi file dalam format base64  
+  - GAGAL:  
+    - status: ERROR  
+    - data: pesan kesalahan  
+
+3. UPLOAD  
+* TUJUAN: Mengirim file dari client ke server dengan isi dalam format base64  
+* PARAMETER:  
+  - PARAMETER1 dan PARAMETER2 digabung dalam satu string dengan pemisah `||`:  
+    - Sebelum `||` adalah nama file tujuan di server  
+    - Setelah `||` adalah isi file yang sudah di-encode dalam base64 (tanpa spasi)  
+* FORMAT:  
+  UPLOAD nama_file.ext||isi_file_base64\r\n\r\n  
+* HASIL:  
+  - BERHASIL:  
+    - status: OK  
+    - data: pesan keberhasilan upload  
+  - GAGAL:  
+    - status: ERROR  
+    - data: pesan kesalahan  
+
+4. DELETE  
+* TUJUAN: Menghapus file di server  
+* PARAMETER:  
+  - PARAMETER1: nama file yang ingin dihapus  
+* FORMAT:  
+  DELETE nama_file.ext\r\n\r\n  
+* HASIL:  
+  - BERHASIL:  
+    - status: OK  
+    - data: pesan keberhasilan penghapusan  
+  - GAGAL:  
+    - status: ERROR  
+    - data: pesan kesalahan  
+
+5. ERROR HANDLING  
+* Jika request tidak dikenali:  
+  - status: ERROR  
+  - data: request tidak dikenali  
+
+CATATAN:  
+Dengan penambahan fitur `UPLOAD` dan `DELETE`, protokol ini memungkinkan transfer dua arah antara client dan server. Client dapat mengambil, mengirim, maupun menghapus file pada direktori server. Setiap komunikasi tetap menggunakan protokol berbasis teks yang dikemas dalam format JSON dan diterminasi oleh "\r\n\r\n".
